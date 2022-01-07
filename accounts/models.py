@@ -1,6 +1,8 @@
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.db import models
 
+from rest_framework_simplejwt.tokens import RefreshToken
+
 # Create your models here.
 class UserManager(BaseUserManager):
     def create_user(
@@ -62,6 +64,10 @@ class User(AbstractBaseUser):
         "Does the user have permissions to view the app `app_label`?"
         # Simplest possible answer: Yes, always
         return True
+
+    def token(self):
+        refreshToken = RefreshToken.for_user(self)
+        return {"refresh": str(refreshToken), "access": str(refreshToken.access_token)}
 
     def __str__(self):
         return self.email

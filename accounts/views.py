@@ -2,7 +2,9 @@ from django.contrib.auth import get_user_model
 
 User = get_user_model()
 
-from datetime import timezone
+import uuid
+
+from django.utils import timezone
 from rest_framework import generics, mixins, viewsets, permissions, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -61,10 +63,13 @@ class LoginView(APIView):
                     "email": user.email,
                     "name": user.name,
                     "nickname": user.nickname,
+                    "access_token": user.token()["access"],
+                    "refresh_token": user.token()["refresh"],
                 },
                 status=status.HTTP_200_OK,
             )
-            """ accessExpirationTime = timezone.datetime.strftime(
+
+            accessExpirationTime = timezone.datetime.strftime(
                 timezone.now() + timezone.timedelta(minutes=60),
                 "%a, %d-%b-%Y %H:%M:%S GMT",
             )
@@ -88,6 +93,6 @@ class LoginView(APIView):
                 key="authtoken",
                 value=uuid.uuid4(),
                 expires=refreshExpirationTime,
-            ) """
+            )
 
             return response
