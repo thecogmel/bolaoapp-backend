@@ -19,6 +19,7 @@ class UserViewSet(
     mixins.DestroyModelMixin,
     mixins.UpdateModelMixin,
     mixins.CreateModelMixin,
+    mixins.ListModelMixin,
 ):
     queryset = User.objects.all()
     serializer_class = UserSerializer
@@ -36,7 +37,7 @@ class SearchUserListView(generics.ListAPIView):
 
     serializer_class = SearchUserSerializer
     permission_classes = [permissions.IsAuthenticated]
-    queryset = User.objects.filter(is_superuser=True).order_by("-email")
+    queryset = User.objects.order_by("-email")
     filter_backends = [filters.SearchFilter]
     search_fields = ["email", "name", "nickname"]
 
