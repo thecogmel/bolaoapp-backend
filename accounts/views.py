@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from django.shortcuts import get_object_or_404
 
 User = get_user_model()
 
@@ -20,9 +21,15 @@ class UserViewSet(
     mixins.UpdateModelMixin,
     mixins.CreateModelMixin,
     mixins.ListModelMixin,
+    mixins.RetrieveModelMixin,
 ):
     queryset = User.objects.all()
     serializer_class = UserSerializer
+
+    def retrieve(self, request, pk=None):
+        user = get_object_or_404(self.queryset, pk=pk)
+        serializer = UserSerializer(user)
+        return Response(serializer.data)
 
     def create(self, request):
         """Register new user"""
@@ -37,9 +44,9 @@ class SearchUserListView(generics.ListAPIView):
 
     serializer_class = SearchUserSerializer
     permission_classes = [permissions.IsAuthenticated]
-    queryset = User.objects.order_by("-email")
+    queryset = User.objects.order_by("-nickname")
     filter_backends = [filters.SearchFilter]
-    search_fields = ["email", "name", "nickname"]
+    search_fields = ["name", "nickname"]
 
 
 class LoginView(APIView):
@@ -47,11 +54,11 @@ class LoginView(APIView):
     permission_classes = [permissions.AllowAny]
 
     def post(self, request):
-        email = request.data["email"].lower()
+        nickname = request.data["nickname"]
         password = request.data["password"]
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid(raise_exception=True):
-            user = authenticate(email=email, password=password)
+            user = authenticate(nickname=nickname, password=password)
             if not user:
                 return Response(
                     {"error": "Credenciais Inválidas"},
@@ -61,7 +68,6 @@ class LoginView(APIView):
             response = Response(
                 {
                     "id": user.id,
-                    "email": user.email,
                     "name": user.name,
                     "nickname": user.nickname,
                     "access_token": user.token()["access"],

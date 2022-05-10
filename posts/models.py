@@ -1,3 +1,4 @@
+from enum import unique
 from pyexpat import model
 from django.db import models
 
@@ -21,3 +22,6 @@ class Reaction(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     modified_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = ["user", "post"]

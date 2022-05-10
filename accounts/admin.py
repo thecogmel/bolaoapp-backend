@@ -3,10 +3,9 @@ from .models import User
 
 # Register your models here.
 class UserAdmin(admin.ModelAdmin):
-    search_fields = ["email"]
+    search_fields = ["nickname"]
     list_display = (
         "id",
-        "email",
         "name",
         "nickname",
         "is_active",
