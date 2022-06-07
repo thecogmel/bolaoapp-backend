@@ -2,7 +2,7 @@ from django.urls import path
 from django.conf.urls import include
 
 from rest_framework.routers import DefaultRouter
-from .views import LoginView, SearchUserListView, UserViewSet
+from .views import LoginView, ResetPasswordView, SearchUserListView, UserViewSet
 
 router = DefaultRouter()
 
@@ -13,4 +13,5 @@ urlpatterns = [
     path("", include(router.urls)),
     path("signin/", LoginView.as_view(), name="signin"),
     path("search-user/", SearchUserListView.as_view(), name="search-user"),
+    path("reset-password/", ResetPasswordView.as_view(), name="reset-password"),
 ]

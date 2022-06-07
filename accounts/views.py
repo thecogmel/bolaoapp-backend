@@ -10,7 +10,12 @@ from rest_framework import generics, mixins, viewsets, permissions, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.contrib.auth import authenticate
-from .serializers import LoginSerializer, SearchUserSerializer, UserSerializer
+from .serializers import (
+    LoginSerializer,
+    ResetPasswordSerializer,
+    SearchUserSerializer,
+    UserSerializer,
+)
 from rest_framework import filters
 from .models import User
 
@@ -103,3 +108,23 @@ class LoginView(APIView):
             )
 
             return response
+
+
+class ResetPasswordView(APIView):
+    serializer_class = ResetPasswordSerializer
+    permission_classes = [permissions.AllowAny]
+
+    def patch(self, request):
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            try:
+                user = User.objects.get(nickname=request.data["nickname"])
+                serializer.update(instance=user, validated_data=request.data)
+                return Response(
+                    {"success": "Password redefinido com sucesso."},
+                    status=status.HTTP_200_OK,
+                )
+            except:
+                return Response({"error": ["Erro na busca de usuário"]})
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
